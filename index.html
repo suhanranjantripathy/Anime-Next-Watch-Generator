@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Next Watch Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="navbar">
+        <div class="nav-left">
+            <button class="menu-btn">
+                <svg viewBox="0 0 24 24" fill="none" class="menu-icon">
+                    <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </button>
+            <div class="logo">
+                <span class="logo-suge">Suhan's</span>
+                <span class="logo-anime">Anime</span>
+                <span class="logo-exclam">!</span>
+            </div>
+        </div>
+
+        <div class="nav-center">
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search...">
+                <button class="search-icon-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <!-- Placeholders for icons if needed -->
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Left Column: Hero & Popular -->
+        <section class="content-left">
+            <!-- Hero Banner -->
+            <div id="hero-banner" class="hero-banner">
+                <div class="hero-placeholder">Loading Featured Anime...</div>
+                <img src="" id="hero-image" class="hero-image" alt="Featured Anime">
+                <div class="hero-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <div class="hero-gradient"></div>
+                <div class="hero-info">
+                    <h2 id="hero-title" class="hero-title"></h2>
+                    <p id="hero-synopsis" class="hero-synopsis"></p>
+                    <button id="hero-watch-btn" class="watch-now-btn">Generate Random Pick</button>
+                </div>
+            </div>
+
+            <div class="announcement">
+                👉 Having trouble deciding? Use the filters on the right or click "Generate Random Pick" above!
+            </div>
+
+            <h3 class="section-title">Popular Today</h3>
+            <div id="popular-content" class="popular-grid">
+                <!-- Anime Grid Cards go here -->
+            </div>
+            <div id="grid-loader" class="loader">Loading...</div>
+        </section>
+
+        <!-- Right Column: Filters & Top List -->
+        <aside class="sidebar-right">
+            <!-- Filter Panel -->
+            <div class="filter-panel">
+                <div class="filter-grid">
+                    <div class="select-wrapper">
+                        <select id="filter-genre">
+                            <option value="">Genre All</option>
+                        </select>
+                        <svg class="chevron" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="select-wrapper">
+                        <select id="filter-type">
+                            <option value="">Type All</option>
+                            <option value="tv">TV</option>
+                            <option value="movie">Movie</option>
+                        </select>
+                        <svg class="chevron" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="select-wrapper">
+                        <select id="filter-status">
+                            <option value="">Status All</option>
+                            <option value="airing">Airing</option>
+                            <option value="complete">Complete</option>
+                        </select>
+                        <svg class="chevron" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="select-wrapper" style="grid-column: span 1;">
+                        <select id="filter-order">
+                            <option value="score">Order by Rating</option>
+                            <option value="popularity">Order by Popularity</option>
+                        </select>
+                        <svg class="chevron" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                </div>
+                <button id="sidebar-search-btn" class="sidebar-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg> Search
+                </button>
+            </div>
+
+            <!-- Top List Panel -->
+            <div class="top-list-panel">
+                <div class="tabs">
+                    <button class="tab active">Top Anime</button>
+                    <button class="tab">Trending</button>
+                </div>
+                <div id="top-anime-list" class="top-list-container">
+                    <!-- Top List Items go here -->
+                </div>
+                <div id="list-loader" class="loader">Loading...</div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Templates -->
+    <template id="grid-card-template">
+        <div class="anime-card">
+            <div class="image-container">
+                <img src="" alt="" class="card-img" loading="lazy">
+                <div class="card-badges">
+                    <span class="badge type-badge">TV</span>
+                </div>
+                <div class="card-overlay">
+                    <button class="play-btn">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="card-info">
+                <h4 class="card-title"></h4>
+            </div>
+        </div>
+    </template>
+
+    <template id="list-item-template">
+        <div class="list-item">
+            <div class="rank"></div>
+            <img src="" alt="" class="list-img" loading="lazy">
+            <div class="list-info">
+                <h4 class="list-title"></h4>
+                <div class="list-genres">Genres: <span></span></div>
+                <div class="list-rating">
+                    <span class="stars">★★★★☆</span>
+                    <span class="score"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
