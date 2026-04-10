@@ -426,21 +426,32 @@ body {
     margin-bottom: 1rem;
 }
 
+.sidebar-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.4rem;
+}
+
 .select-wrapper {
     position: relative;
     background-color: #1a1a1a;
+    border-radius: 4px;
 }
 
 .select-wrapper select {
     width: 100%;
     background: none;
     border: 1px solid var(--border);
-    color: #999;
-    padding: 0.7rem 0.8rem;
-    font-size: 0.8rem;
+    color: #eee;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
     appearance: none;
     outline: none;
     cursor: pointer;
+    font-family: inherit;
 }
 
 .select-wrapper .chevron {
@@ -460,25 +471,25 @@ body {
 
 .sidebar-btn {
     width: 100%;
-    background-color: #222;
-    color: white;
-    border: 1px solid var(--border);
-    padding: 0.8rem;
-    font-weight: 600;
+    background-color: var(--accent);
+    color: #000;
+    border: none;
+    padding: 0.7rem;
+    font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    transition: 0.3s;
+    transition: 0.2s;
     font-size: 0.85rem;
     text-transform: uppercase;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
 }
 
 .sidebar-btn:hover {
-    background-color: var(--accent);
-    color: #000;
-    border-color: var(--accent);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
 }
 
 /* Top List Panel */

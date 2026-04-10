@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suhan's Anime Watch List</title>
+    <title>AnimeSuge Clone - Watch Free Anime</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -19,8 +19,8 @@
                 </svg>
             </button>
             <div class="logo">
-                <span class="logo-suge">Suhan's</span>
-                <span class="logo-anime">List</span>
+                <span class="logo-suge">Anime</span>
+                <span class="logo-anime">Suge</span>
                 <span class="logo-exclam">!</span>
             </div>
         </div>
@@ -85,10 +85,11 @@
         <aside class="sidebar-right">
             <!-- Filter Panel -->
             <div class="filter-panel">
+                <div class="sidebar-label">Filter</div>
                 <div class="filter-grid">
                     <div class="select-wrapper">
                         <select id="filter-genre">
-                            <option value="">Genre All</option>
+                            <option value="">Genre: All</option>
                         </select>
                         <svg class="chevron" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -97,7 +98,7 @@
                     </div>
                     <div class="select-wrapper">
                         <select id="filter-type">
-                            <option value="">Type All</option>
+                            <option value="">Type: All</option>
                             <option value="tv">TV</option>
                             <option value="movie">Movie</option>
                         </select>
@@ -108,7 +109,7 @@
                     </div>
                     <div class="select-wrapper">
                         <select id="filter-status">
-                            <option value="">Status All</option>
+                            <option value="">Status: All</option>
                             <option value="airing">Airing</option>
                             <option value="complete">Complete</option>
                         </select>
@@ -117,10 +118,10 @@
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </div>
-                    <div class="select-wrapper" style="grid-column: span 1;">
+                    <div class="select-wrapper">
                         <select id="filter-order">
-                            <option value="score">Order by Rating</option>
-                            <option value="popularity">Order by Popularity</option>
+                            <option value="score">Order: Score</option>
+                            <option value="popularity">Order: Popularity</option>
                         </select>
                         <svg class="chevron" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -129,11 +130,7 @@
                     </div>
                 </div>
                 <button id="sidebar-search-btn" class="sidebar-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg> Search
+                    Filter
                 </button>
             </div>
 
@@ -142,7 +139,6 @@
                 <div class="tabs">
                     <button class="tab active">Top Anime</button>
                     <button class="tab">Trending</button>
-                    <button class="tab">Genres</button>
                 </div>
                 <div id="top-anime-list" class="top-list-container">
                     <!-- Top List Items go here -->
