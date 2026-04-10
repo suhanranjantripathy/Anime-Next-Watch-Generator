@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const popularContent = document.getElementById('popular-content');
     const gridLoader = document.getElementById('grid-loader');
     
+    const upcomingContent = document.getElementById('upcoming-content');
+    const upcomingLoader = document.getElementById('upcoming-loader');
+
     const filterGenre = document.getElementById('filter-genre');
     const filterType = document.getElementById('filter-type');
     const filterStatus = document.getElementById('filter-status');
@@ -21,7 +24,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const searchInput = document.getElementById('search-input');
     const searchIconBtn = document.querySelector('.search-icon-btn');
+    const logo = document.querySelector('.logo');
     
+    // Modal Elements
+    const modal = document.getElementById('anime-modal');
+    const closeBtn = document.querySelector('.close-btn');
+    const modalImg = document.getElementById('modal-img');
+    const modalTitle = document.getElementById('modal-title');
+    const modalStatus = document.getElementById('modal-status');
+    const modalRating = document.getElementById('modal-rating');
+    const modalScore = document.getElementById('modal-score');
+    const modalEpisodes = document.getElementById('modal-episodes');
+    const modalStudios = document.getElementById('modal-studios');
+    const modalGenres = document.getElementById('modal-genres');
+    const modalSynopsis = document.getElementById('modal-synopsis');
+    const modalStreaming = document.getElementById('modal-streaming');
+    const modalCharacters = document.getElementById('modal-characters');
+    const modalTrailer = document.getElementById('modal-trailer');
+    const modalTrailerLink = document.getElementById('modal-trailer-link');
+    const modalTrailerSection = document.getElementById('modal-trailer-section');
+
     // Templates
     const gridCardTemplate = document.getElementById('grid-card-template');
     const listItemTemplate = document.getElementById('list-item-template');
@@ -36,33 +58,61 @@ document.addEventListener('DOMContentLoaded', () => {
         loadGenres();
         
         // Initial fetches
-        const topData = await fetchGridData('https://api.jikan.moe/v4/top/anime?filter=airing&limit=12');
+        const topData = await fetchGridData('https://api.jikan.moe/v4/top/anime?filter=airing&limit=12', popularContent, gridLoader);
         if (topData) {
             currentHeroList = topData;
             setRandomHero();
         }
 
+        fetchGridData('https://api.jikan.moe/v4/seasons/upcoming?limit=12', upcomingContent, upcomingLoader);
         fetchTopList('https://api.jikan.moe/v4/top/anime?limit=10');
     }
 
     function setupEventListeners() {
-        // Hero Random Pick
-        heroWatchBtn.addEventListener('click', () => {
-            setRandomHero();
+        // Reset on logo click
+        logo.style.cursor = 'pointer';
+        logo.addEventListener('click', () => {
+            window.location.reload();
+        });
+
+        // Hero Random Pick - Use random API directly
+        heroWatchBtn.addEventListener('click', async () => {
+            const originalText = heroWatchBtn.textContent;
+            heroWatchBtn.textContent = 'Generating...';
+            try {
+                const response = await fetch(`${API_BASE}/random/anime`);
+                const data = await response.json();
+                if(data.data) {
+                    updateHero(data.data);
+                }
+            } catch(e) {
+                console.error(e);
+            }
+            heroWatchBtn.textContent = originalText;
         });
 
         // Sidebar Search
         sidebarSearchBtn.addEventListener('click', () => {
             const url = buildSearchUrl();
-            fetchGridData(url);
+            document.querySelector('.section-title').textContent = 'Filter Results';
+            fetchGridData(url, popularContent, gridLoader);
+            
+            // Hide upcoming and announcement during search results
+            document.getElementById('upcoming-content').parentElement.style.display = 'none';
+            document.querySelector('.announcement').style.display = 'none';
         });
 
         // Navbar Search
         searchIconBtn.addEventListener('click', () => {
             const q = searchInput.value.trim();
             if (q) {
-                const url = `${API_BASE}/anime?q=${encodeURIComponent(q)}&sfw=true`;
-                fetchGridData(url);
+                const url = `${API_BASE}/anime?q=${encodeURIComponent(q)}&sfw=true&limit=20`;
+                document.querySelector('.section-title').textContent = `Search Results: "${q}"`;
+                fetchGridData(url, popularContent, gridLoader);
+                
+                // Hide upcoming and announcement
+                document.getElementById('upcoming-content').parentElement.style.display = 'none';
+                document.querySelector('.announcement').style.display = 'none';
             }
         });
 
@@ -87,6 +137,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     fetchTopList('https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=10');
                 }
             });
+        });
+
+        // Modal Close
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            modalTrailer.src = ''; // stop trailer
+            modalTrailerLink.href = '#';
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target == modal) {
+                modal.style.display = 'none';
+                modalTrailer.src = '';
+                modalTrailerLink.href = '#';
+            }
         });
     }
 
@@ -118,27 +182,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return url;
     }
 
-    async function fetchGridData(url) {
-        popularContent.innerHTML = '';
-        gridLoader.style.display = 'block';
+    async function fetchGridData(url, container, loader) {
+        container.innerHTML = '';
+        loader.style.display = 'block';
         
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error('API Rate Limit or Error');
             const data = await response.json();
             
-            gridLoader.style.display = 'none';
-            renderGrid(data.data || []);
+            loader.style.display = 'none';
+            renderGrid(data.data || [], container);
             
-            // Only update hero list if we get results
-            if (data.data && data.data.length > 0) {
-                currentHeroList = data.data;
-            }
             return data.data;
         } catch (error) {
             console.error('Error fetching grid data', error);
-            gridLoader.style.display = 'none';
-            popularContent.innerHTML = `<p style="color:var(--text-muted);">Error fetching results.</p>`;
+            loader.style.display = 'none';
+            container.innerHTML = `<p style="color:var(--text-muted);">Error fetching results. API rate limits reached likely.</p>`;
             return null;
         }
     }
@@ -157,13 +217,13 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error fetching list data', error);
             listLoader.style.display = 'none';
-            topAnimeList.innerHTML = `<p style="color:var(--text-muted);">Error fetching list.</p>`;
+            topAnimeList.innerHTML = `<p style="color:var(--text-muted);">Error fetching list. Try again later.</p>`;
         }
     }
 
-    function renderGrid(animeArray) {
+    function renderGrid(animeArray, container) {
         if(animeArray.length === 0) {
-            popularContent.innerHTML = `<p style="color:var(--text-muted)">No anime found.</p>`;
+            container.innerHTML = `<p style="color:var(--text-muted)">No anime found.</p>`;
             return;
         }
 
@@ -173,19 +233,29 @@ document.addEventListener('DOMContentLoaded', () => {
             clone.querySelector('.card-img').src = anime.images?.webp?.large_image_url || '';
             clone.querySelector('.card-title').textContent = anime.title_english || anime.title;
             
-            // Badges
-            const typeBadge = clone.querySelector('.type-badge');
-            typeBadge.textContent = anime.type || 'TV';
-            
+            // Add episode badge
+            if (anime.episodes) {
+                const epBadge = document.createElement('span');
+                epBadge.className = 'badge ep-badge';
+                epBadge.textContent = `EP ${anime.episodes}`;
+                clone.querySelector('.card-badges').appendChild(epBadge);
+            }
+
             // Add completed badge if finished
             if (anime.status === 'Finished Airing') {
                 const statusBadge = document.createElement('span');
                 statusBadge.className = 'badge status-completed';
-                statusBadge.textContent = 'COMPLETED';
+                statusBadge.textContent = 'FINISHED';
                 clone.querySelector('.card-badges').appendChild(statusBadge);
             }
 
-            popularContent.appendChild(clone);
+            // Click event to open modal
+            const cardElement = clone.querySelector('.anime-card');
+            cardElement.addEventListener('click', () => {
+                openAnimeModal(anime.mal_id);
+            });
+
+            container.appendChild(clone);
         });
     }
 
@@ -208,18 +278,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const starText = '★'.repeat(Math.round(scoreNum / 2)) + '☆'.repeat(5 - Math.round(scoreNum / 2));
             clone.querySelector('.stars').textContent = starText;
 
+            // Click event
+            const listItemElem = clone.querySelector('.list-item');
+            listItemElem.addEventListener('click', () => {
+                openAnimeModal(anime.mal_id);
+            });
+
             topAnimeList.appendChild(clone);
         });
     }
 
     function setRandomHero() {
         if (!currentHeroList || currentHeroList.length === 0) return;
-        
         const anime = currentHeroList[Math.floor(Math.random() * currentHeroList.length)];
-        
+        updateHero(anime);
+    }
+
+    function updateHero(anime) {
         // Use a high-res image or standard cover
         const imgUrl = anime.trailer?.images?.maximum_image_url || anime.images?.webp?.large_image_url;
-        
         heroImage.src = imgUrl || '';
         
         // Fade in effect
@@ -228,5 +305,87 @@ document.addEventListener('DOMContentLoaded', () => {
         
         heroTitle.textContent = anime.title_english || anime.title;
         heroSynopsis.textContent = anime.synopsis ? anime.synopsis.replace(/\[Written by MAL Rewrite\]/g, '').trim() : 'No synopsis available.';
+    }
+
+    async function openAnimeModal(mal_id) {
+        modal.style.display = 'block';
+        modalTitle.textContent = 'Loading...';
+        modalSynopsis.textContent = '';
+        modalCharacters.innerHTML = '';
+        modalTrailer.src = '';
+        modalImg.src = '';
+        
+        try {
+            // Fetch detailed anime info
+            const resInfo = await fetch(`${API_BASE}/anime/${mal_id}/full`);
+            const infoData = await resInfo.json();
+            const anime = infoData.data;
+
+            if(!anime) return;
+
+            modalTitle.textContent = anime.title_english || anime.title;
+            modalImg.src = anime.images?.webp?.large_image_url || '';
+            modalStatus.textContent = anime.status || 'Unknown';
+            modalRating.textContent = anime.rating || 'N/A';
+            modalScore.textContent = `Score: ${anime.score || 'N/A'}`;
+            modalEpisodes.textContent = anime.episodes || 'Unknown';
+            modalStudios.textContent = anime.studios ? anime.studios.map(s => s.name).join(', ') : 'Unknown';
+            modalGenres.textContent = anime.genres ? anime.genres.map(g => g.name).join(', ') : 'Unknown';
+            modalSynopsis.textContent = anime.synopsis ? anime.synopsis.replace(/\[Written by MAL Rewrite\]/g, '').trim() : 'No synopsis available.';
+            
+            // Where to Watch
+            modalStreaming.innerHTML = '';
+            if (anime.streaming && anime.streaming.length > 0) {
+                anime.streaming.forEach(stream => {
+                    const a = document.createElement('a');
+                    a.href = stream.url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.className = 'streaming-link';
+                    a.textContent = stream.name;
+                    modalStreaming.appendChild(a);
+                });
+            } else {
+                modalStreaming.innerHTML = '<p style="color:var(--text-muted); font-size: 0.95rem;">No streaming details available.</p>';
+            }
+
+            if (anime.trailer && anime.trailer.youtube_id) {
+                modalTrailer.src = `https://www.youtube.com/embed/${anime.trailer.youtube_id}`;
+                modalTrailerSection.style.display = 'block';
+                modalTrailerLink.href = `https://www.youtube.com/watch?v=${anime.trailer.youtube_id}`;
+            } else {
+                modalTrailerSection.style.display = 'none';
+            }
+
+            // Fetch Characters
+            // To avoid rapid rate limits, add a slight delay or just fetch parallel
+            const resChars = await fetch(`${API_BASE}/anime/${mal_id}/characters`);
+            const charsData = await resChars.json();
+            const chars = charsData.data || [];
+
+            // Display top 10 characters
+            modalCharacters.innerHTML = '';
+            const topChars = chars.slice(0, 15);
+            if(topChars.length === 0) {
+                modalCharacters.innerHTML = '<p style="color:var(--text-muted);">No characters found.</p>';
+            } else {
+                topChars.forEach(c => {
+                    const charDiv = document.createElement('div');
+                    charDiv.className = 'character-card';
+                    const imgUrl = c.character.images?.webp?.image_url || '';
+                    const role = c.role || '';
+                    charDiv.innerHTML = `
+                        <img src="${imgUrl}" alt="${c.character.name}" loading="lazy">
+                        <div class="char-name">${c.character.name}</div>
+                        <p>${role}</p>
+                    `;
+                    modalCharacters.appendChild(charDiv);
+                });
+            }
+
+        } catch(error) {
+            console.error('Failed to load modal details', error);
+            modalTitle.textContent = 'Error loading details.';
+        }
     }
 });
